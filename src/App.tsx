@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
 
 import { Navbar } from "./components/Navbar";
-import { CatalogPage } from "./pages/CatalogPage";
-import { DetailPage } from "./pages/DetailPage";
-import { CartPage } from "./pages/CartPage";
+import { Home } from "./pages/Home";
+import { Detail } from "./pages/Detail";
+import { ShoppingCart } from "./pages/ShoppingCart";
 
 import "./App.css";
 
@@ -12,9 +12,9 @@ function App() {
     <div className="bg-gray-100 h-screen">
       <Navbar></Navbar>
       <Routes>
-        <Route path="/" element={<CatalogPage />}></Route>
-        <Route path="/product/:productId" element={<DetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/product/:productId" element={<Detail />} />
+        <Route path="/cart" element={<ShoppingCart />} />
       </Routes>
     </div>
   );

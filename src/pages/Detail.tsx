@@ -3,23 +3,23 @@ import { useParams } from "react-router";
 
 import cartWhite from "../assets/img/cartWhite.svg";
 
-import { getProduct, getProductColor, getSize, getSizes } from "../services/api";
+import { getProduct, getProductColor, getSize, getSizes } from "../services/api.js";
 
-import type { ProductType } from "../types";
+import type { ProductType } from "../types/index.js";
+
 import { ImageSelector } from "../components/ImageSelector.js";
 import { ColorSelector } from "../components/ColorSelector.js";
 import { SizeSelector } from "../components/SizeSelector.js";
 import BackHome from "../components/Back.js";
 
-export const DetailPage = () => {
+export const Detail = () => {
   const { productId } = useParams();
 
   const [product, setProduct] = useState<ProductType | null>(null);
 
   const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(1);
+  const [selectedSize, setSelectedSize] = useState(null);
 
-  const [size, setSize] = useState([]);
   const [sizes, setSizes] = useState([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -59,6 +59,18 @@ export const DetailPage = () => {
       .catch((error) => console.error("Ошибка при загрузке продуктов:", error));
   };
 
+  const handleAddCart = (product, selectedColor, selectedSize) => {
+    let shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
+    if (shoppingCart === null) shoppingCart = [];
+    const newProduct = {
+      id: Date.now() + Math.random(),
+      productId: product.id,
+      colorId: selectedColor.id,
+      sizeId: selectedSize.id,
+    };
+    localStorage.setItem("shoppingCart", JSON.stringify([...shoppingCart, newProduct]));
+  };
+
   return (
     <section className="container mx-auto px-4 py-8">
       <BackHome />
@@ -72,26 +84,19 @@ export const DetailPage = () => {
             <span className="text-2xl font-bold mr-2">$ {selectedColor.price}</span>
           </div>
           <p className="text-gray-700 mb-6">{selectedColor.description}.</p>
-          <ColorSelector colors={product.colors} handleChangeColor={handleChangeColor} />
+          <ColorSelector colors={product.colors} selectedColorId={selectedColor.id} handleChangeColor={handleChangeColor} />
 
-          <SizeSelector sizes={sizes} enableSizes={selectedColor.sizes} handleChangeSize={handleChangeSize} />
+          <SizeSelector
+            sizes={sizes}
+            selectedSizeId={selectedSize === null ? selectedColor.sizes[0] : selectedSize.id}
+            enableSizes={selectedColor.sizes}
+            handleChangeSize={handleChangeSize}
+          />
 
           <div className="flex space-x-4 mb-6">
             <button
               className="flex gap-2 items-center text-white px-6 py-2 rounded-md bg-sky-500 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 cursor-pointer"
-              onClick={() => {
-                let shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
-                if (shoppingCart === null) shoppingCart = [];
-                const newProduct = {
-                  id: product.id + "" + selectedColor.id + "" + selectedSize.id,
-                  image: selectedColor.images || product.colors[0].images,
-                  name: product?.name,
-                  color: selectedColor.name,
-                  size: selectedSize.label,
-                  price: selectedColor.price,
-                };
-                localStorage.setItem("shoppingCart", JSON.stringify([...shoppingCart, newProduct]));
-              }}
+              onClick={() => handleAddCart(product, selectedColor, selectedSize)}
             >
               <img src={cartWhite} alt="cart img" />
               Добавить в корзину

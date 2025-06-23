@@ -9,12 +9,13 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({ images }) => {
 
   return (
     <div className="w-full md:w-1/2 px-4 mb-8">
-      <img src={images[currentIndex]} alt={`${currentIndex}`} className="w-full h-auto rounded-lg shadow-md mb-4" />
+      <img src={images[currentIndex]} alt={`${currentIndex}`} className="h-auto max-w-md rounded-lg shadow-md mx-auto" />
 
       <div className="flex gap-4 py-4 justify-center overflow-x-auto">
         {images.map((name: string, index: number) => {
           return (
             <img
+              key={index}
               src={name}
               alt="name"
               className="size-16 sm:size-20 object-cover rounded-md cursor-pointer opacity-60 hover:opacity-100 transition duration-300"

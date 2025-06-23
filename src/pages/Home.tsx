@@ -1,11 +1,11 @@
 import { useEffect, useState, type SetStateAction } from "react";
 
-import { getProducts } from "../services/api";
+import { getProducts } from "../services/api.js";
 import CatalogItem from "../components/CatalogItem.js";
 
 import type { ProductType } from "../types/index.js";
 
-export const CatalogPage = () => {
+export const Home = () => {
   const [products, setProducts] = useState<ProductType[]>([]);
 
   useEffect(() => {

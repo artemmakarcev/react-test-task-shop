@@ -3,12 +3,12 @@ import type { ColorType } from "../types";
 
 type ColorPropsType = {
   colors: ColorType[];
+  selectedColorId: number;
   handleChangeColor: (productId: string, colorId: number) => void;
 };
 
-export const ColorSelector = ({ colors, handleChangeColor }: ColorPropsType): React.JSX.Element => {
+export const ColorSelector = ({ colors, selectedColorId, handleChangeColor }: ColorPropsType): React.JSX.Element => {
   const { productId: id } = useParams();
-  if (!id) return <Navigate to="/" />;
 
   return (
     <div className="mb-6">
@@ -17,7 +17,9 @@ export const ColorSelector = ({ colors, handleChangeColor }: ColorPropsType): Re
         {colors.map((color) => (
           <button
             key={color.id}
-            className="px-3 py-2 rounded-lg border-2 capitalize hover:bg-indigo-100 transition-all disabled:opacity-[0.2] cursor-pointer border-transparent"
+            className={`px-3 py-2 rounded-lg border-2 capitalize hover:bg-indigo-100 transition-all disabled:opacity-[0.2] cursor-pointer border-transparent ${
+              color.id === selectedColorId ? "bg-lime-500" : ""
+            }`}
             onClick={() => handleChangeColor(id, color.id)}
           >
             {color.name}
