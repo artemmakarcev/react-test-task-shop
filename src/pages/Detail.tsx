@@ -1,18 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SetStateAction } from "react";
 import { useParams } from "react-router";
 
 import cartWhite from "../assets/img/cartWhite.svg";
 
 import { getProduct, getProductColor, getSize, getSizes } from "../services/api.js";
 
-import type { ProductType } from "../types/index.js";
+import type { ProductType, SizeType } from "../types/index.js";
 
 import { ImageSelector } from "../components/ImageSelector.js";
 import { ColorSelector } from "../components/ColorSelector.js";
 import { SizeSelector } from "../components/SizeSelector.js";
 import BackHome from "../components/Back.js";
 
+import { useCart } from "../context/CartContext";
+
 export const Detail = () => {
+  const { addItemCart } = useCart();
+
   const { productId } = useParams();
 
   const [product, setProduct] = useState<ProductType | null>(null);
@@ -23,28 +27,30 @@ export const Detail = () => {
   const [sizes, setSizes] = useState([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     getProduct(productId)
-      .then((res) => {
+      .then((res: SetStateAction<ProductType | null>) => {
         setProduct(res);
-        if (res.colors.length > 0) {
+        if (res?.colors.length > 0) {
           setSelectedColor(res.colors[0]);
         }
       })
-      .catch((error) => setError(error.message))
+      .catch((error: { message: SetStateAction<string> }) => setError(error.message))
       .finally(() => setIsLoading(false));
   }, [productId]);
 
   useEffect(() => {
     getSizes()
-      .then((data) => setSizes(data))
-      .catch((error) => setError(error.message));
+      .then((res: SetStateAction<SizeType[]>) => setSizes(res))
+      .catch((error: { message: SetStateAction<string> }) => setError(error.message));
   });
 
   if (isLoading) {
     return <h2>Загрузка...</h2>;
   }
+  if (error) return <p>error</p>;
 
   const handleChangeColor = (productID: string, colorID: number): void => {
     getProductColor(productID, colorID)
@@ -60,15 +66,13 @@ export const Detail = () => {
   };
 
   const handleAddCart = (product, selectedColor, selectedSize) => {
-    let shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
-    if (shoppingCart === null) shoppingCart = [];
-    const newProduct = {
+    const newItem = {
       id: Date.now() + Math.random(),
       productId: product.id,
       colorId: selectedColor.id,
       sizeId: selectedSize.id,
     };
-    localStorage.setItem("shoppingCart", JSON.stringify([...shoppingCart, newProduct]));
+    addItemCart(newItem);
   };
 
   return (

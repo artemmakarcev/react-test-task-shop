@@ -8,15 +8,22 @@ import type { ProductType } from "../types/index.js";
 export const Home = () => {
   const [products, setProducts] = useState<ProductType[]>([]);
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
   useEffect(() => {
-    getProducts().then((result: SetStateAction<ProductType[]>) => {
-      setProducts(result);
-    });
+    getProducts()
+      .then((res: SetStateAction<ProductType[]>) => {
+        setProducts(res);
+      })
+      .catch((error: { message: SetStateAction<string> }) => setError(error.message))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  if (products === null) {
+  if (isLoading) {
     return <h2>Загрузка...</h2>;
   }
+  if (error) return <p>error</p>;
 
   return (
     <div className="max-w-screen-xl mx-auto p-5 sm:p-10 md:p-16">
