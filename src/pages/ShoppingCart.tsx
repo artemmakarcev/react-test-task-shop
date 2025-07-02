@@ -1,9 +1,10 @@
-import { useEffect, useState, type SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import BackHome from "../components/Back";
 
 import { getProduct, getProductColor, getSize } from "../services/api.js";
 
 import { useCart } from "../context/CartContext";
+import type { CombinedData } from "../types/index.js";
 
 export const ShoppingCart = () => {
   const { getItemsCart, removeItemCart } = useCart();
@@ -19,11 +20,13 @@ export const ShoppingCart = () => {
       const fetchedProducts = [];
       for (const item of shoppingCart) {
         try {
-          const product = await getProduct(item.productId);
-          const productColor = await getProductColor(item.productId, item.colorId);
-          const size = await getSize(item.sizeId);
+          const productPromise = getProduct(item.productId);
+          const productColorPromise = getProductColor(item.productId, item.colorId);
+          const sizePromise = getSize(item.sizeId);
 
-          const combinedData = {
+          const [product, productColor, size] = await Promise.all([productPromise, productColorPromise, sizePromise]);
+
+          const combinedData: CombinedData = {
             id: item.id,
             product: product,
             color: productColor,
@@ -31,23 +34,22 @@ export const ShoppingCart = () => {
           };
 
           fetchedProducts.push(combinedData);
-        } catch (error) {
-          setError(error.message);
+        } catch {
+          setError("Не удалось загрузить данные о товарах");
         }
       }
       setProductsCart(fetchedProducts);
     }
-
     fetchData();
     setIsLoading(false);
-  }, [productsCart]);
+  }, [shoppingCart]);
 
   if (isLoading) {
     return <h2>Загрузка...</h2>;
   }
-  if (error) return <p>error</p>;
+  if (error) return <p>{error}</p>;
 
-  const handleRemoveCart = (id) => {
+  const handleRemoveCart = (id: number) => {
     removeItemCart(id);
   };
   return (

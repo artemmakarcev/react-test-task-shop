@@ -5,7 +5,7 @@ import { Home } from "./pages/Home";
 import { Detail } from "./pages/Detail";
 import { ShoppingCart } from "./pages/ShoppingCart";
 
-import { CartProvider } from './context/CartContext';
+import { CartProvider } from "./context/CartContext";
 
 import "./App.css";
 
@@ -15,7 +15,7 @@ function App() {
       <CartProvider>
         <Navbar></Navbar>
         <Routes>
-          <Route path="/" element={<Home />}></Route>
+          <Route path="/" element={<Home />} />
           <Route path="/product/:productId" element={<Detail />} />
           <Route path="/cart" element={<ShoppingCart />} />
         </Routes>

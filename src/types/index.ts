@@ -18,3 +18,10 @@ export type SizeType = {
   label: string;
   number: number;
 };
+
+export type CombinedData = {
+  id: number;
+  product: ProductType[];
+  color: string;
+  size: string;
+};

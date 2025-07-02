@@ -5,7 +5,7 @@ import cartWhite from "../assets/img/cartWhite.svg";
 
 import { getProduct, getProductColor, getSize, getSizes } from "../services/api.js";
 
-import type { ProductType, SizeType } from "../types/index.js";
+import type { ColorType, ProductType, SizeType } from "../types/index.js";
 
 import { ImageSelector } from "../components/ImageSelector.js";
 import { ColorSelector } from "../components/ColorSelector.js";
@@ -21,8 +21,8 @@ export const Detail = () => {
 
   const [product, setProduct] = useState<ProductType | null>(null);
 
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState<ColorType | null>(null);
+  const [selectedSize, setSelectedSize] = useState<SizeType | null>(null);
 
   const [sizes, setSizes] = useState([]);
 
@@ -33,9 +33,7 @@ export const Detail = () => {
     getProduct(productId)
       .then((res: SetStateAction<ProductType | null>) => {
         setProduct(res);
-        if (res?.colors.length > 0) {
-          setSelectedColor(res.colors[0]);
-        }
+        setSelectedColor(res.colors[0] ?? "");
       })
       .catch((error: { message: SetStateAction<string> }) => setError(error.message))
       .finally(() => setIsLoading(false));
@@ -90,12 +88,7 @@ export const Detail = () => {
           <p className="text-gray-700 mb-6">{selectedColor.description}.</p>
           <ColorSelector colors={product.colors} selectedColorId={selectedColor.id} handleChangeColor={handleChangeColor} />
 
-          <SizeSelector
-            sizes={sizes}
-            selectedSizeId={selectedSize === null ? selectedColor.sizes[0] : selectedSize.id}
-            enableSizes={selectedColor.sizes}
-            handleChangeSize={handleChangeSize}
-          />
+          <SizeSelector sizes={sizes} selectedSizeId={selectedSize?.id} enableSizes={selectedColor?.sizes} handleChangeSize={handleChangeSize} />
 
           <div className="flex space-x-4 mb-6">
             <button
